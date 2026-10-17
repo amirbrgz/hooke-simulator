@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>قانون هوک (Baloochi & Bozorgzadeh)</title>
+<style>
+  @import url('https://cdn.fontcdn.ir/Font/Persian/B%20Nazanin/B%20Nazanin.css');
+  
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'B Nazanin', 'Tahoma', sans-serif;
+  }
+  
+  body {
+    background-color: #f4f7f6;
+    background-image: radial-gradient(#d1d9e6 1px, transparent 1px);
+    background-size: 20px 20px;
+    color: #2c3e50;
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    font-size: 18px;
+  }
+  
+  .container {
+    max-width: 1350px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 20px;
+  }
+  
+  @media (max-width: 1050px) {
+    .container { grid-template-columns: 1fr; }
+  }
+  
+  h1 {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: 2.2rem;
+    color: #1a5276;
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+  }
+  
+  .canvas-wrap {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 15px;
+    border: 2px solid #bdc3c7;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    position: relative;
+  }
+  
+  canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+    cursor: grab;
+    background: #f8fafc;
+  }
+  
+  canvas:active { cursor: grabbing; }
+
+  .charts-section {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 10px;
+  }
+
+  @media (max-width: 900px) {
+    .charts-section { grid-template-columns: 1fr; }
+  }
+
+  .chart-box {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 15px;
+    border: 2px solid #bdc3c7;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  }
+
+  .chart-box h3 {
+    text-align: center;
+    color: #34495e;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ecf0f1;
+    padding-bottom: 5px;
+  }
+
+  .chart-box canvas {
+    width: 100%;
+    height: 200px;
+    background: #ffffff;
+    cursor: default;
+  }
+  
+  .live-tips {
+    margin-top: 15px;
+    padding: 15px;
+    background: #fdfefe;
+    border-right: 5px solid #e67e22;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    min-height: 80px;
+    transition: all 0.3s ease;
+  }
+  
+  .live-tips h3 {
+    color: #d35400;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .live-tips ul {
+    list-style-type: none;
+    padding-right: 5px;
+  }
+  
+  .live-tips li {
+    margin-bottom: 6px;
+    font-size: 1.05rem;
+    color: #34495e;
+    line-height: 1.5;
+    position: relative;
+    padding-right: 15px;
+  }
+  
+  .live-tips li::before {
+    content: '•';
+    color: #e67e22;
+    font-weight: bold;
+    position: absolute;
+    right: 0;
+    font-size: 1.5rem;
+    line-height: 1;
+    top: -2px;
+  }
+
+  .panel {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    border: 2px solid #bdc3c7;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    height: fit-content;
+  }
+  
+  .formula-box {
+    background: #e8f6f3;
+    border-right: 4px solid #16a085;
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+    font-family: monospace;
+    font-size: 1.2rem;
+    color: #0e6655;
+    font-weight: bold;
+    direction: ltr;
+  }
+  
+  .formula-box small {
+    display: block;
+    font-family: 'B Nazanin', sans-serif;
+    font-size: 0.9rem;
+    color: #16a085;
+    margin-top: 5px;
+    direction: rtl;
+  }
+
+  .control-group label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #34495e;
+  }
+  
+  .control-group label span:last-child {
+    color: #2980b9;
+    font-family: monospace;
+    font-size: 1.1rem;
+    direction: ltr;
+  }
+  
+  input[type="range"] {
+    width: 100%;
+    height: 8px;
+    -webkit-appearance: none;
+    background: #dfe6e9;
+    border-radius: 4px;
+    outline: none;
+  }
+  
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #2980b9;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    border: 2px solid #fff;
+  }
+  
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 5px;
+  }
+  
+  .stat-card {
+    background: #f8f9fa;
+    padding: 8px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #e1e8ed;
+  }
+  
+  .stat-card .label {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    margin-bottom: 2px;
+  }
+  
+  .stat-card .value {
+    font-size: 1.1rem;
+    font-weight: bold;
+    font-family: monospace;
+    direction: ltr;
+    color: #2c3e50;
+  }
+  
+  .val-force { color: #e74c3c; }
+  .val-disp { color: #2980b9; }
+  .val-pe { color: #f39c12; }
+  .val-ke { color: #27ae60; }
+  
+  .buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 5px;
+  }
+  
+  button {
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    background: #95a5a6;
+    color: #fff;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1.1rem;
+    transition: all 0.2s;
+  }
+  
+  button:hover { background: #7f8c8d; }
+  
+  button.primary {
+    background: #2980b9;
+    font-weight: bold;
+  }
+  
+  button.primary:hover { background: #1c5980; }
+  
+  /* استایل آزمون */
+  .quiz-section {
+    grid-column: 1 / -1;
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    border: 2px solid #bdc3c7;
+    margin-top: 10px;
+    display: none;
+  }
+  
+  .quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #ecf0f1;
+    padding-bottom: 10px;
+  }
+  
+  .quiz-question {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #2c3e50;
+  }
+  
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .quiz-option {
+    padding: 12px;
+    background: #f8f9fa;
+    border: 2px solid #e1e8ed;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1.1rem;
+  }
+  
+  .quiz-option:hover {
+    background: #e8f4f8;
+    border-color: #3498db;
+  }
+  
+  .quiz-option.correct {
+    background: #d5f5e3;
+    border-color: #27ae60;
+    color: #145a32;
+  }
+  
+  .quiz-option.wrong {
+    background: #fadbd8;
+    border-color: #c0392b;
+    color: #78281f;
+  }
+
+  .quiz-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    align-items: center;
+  }
+  
+  .quiz-result {
+    text-align: center;
+    padding: 20px;
+    background: #eaf2f8;
+    border-radius: 10px;
+    margin-top: 15px;
+  }
+
+  .score-text {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #e67e22;
+    margin-bottom: 10px;
+  }
+
+  /* پاسخ‌نامه */
+  .answers-review {
+    margin-top: 25px;
+    text-align: right;
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #d5dbdb;
+  }
+  .answers-review h3 {
+    color: #1a5276;
+    border-bottom: 2px solid #ecf0f1;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+  }
+  .review-item {
+    background: #fdfdfd;
+    border-right: 5px solid #bdc3c7;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+  }
+  .review-item.correct { border-right-color: #27ae60; }
+  .review-item.wrong { border-right-color: #c0392b; }
+  .review-q { font-weight: bold; margin-bottom: 8px; color: #2c3e50; }
+  .review-a { font-size: 1rem; margin-bottom: 5px; color: #34495e; }
+  .review-a.correct-text { color: #27ae60; font-weight: bold; }
+  .review-a.wrong-text { color: #c0392b; text-decoration: line-through; }
+  .review-explain { font-size: 0.95rem; color: #7f8c8d; background: #f4f7f6; padding: 8px; border-radius: 4px; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🔬 قانون هوک (Baloochi & Bozorgzadeh)</h1>
+  
+  <!-- بخش شبیه ساز -->
+  <div>
+    <div class="canvas-wrap">
+      <canvas id="canvas" width="800" height="450"></canvas>
+    </div>
+    <!-- نکات آنی -->
+    <div class="live-tips" id="liveTips">
+      <h3>💡 نکات آنی سیستم:</h3>
+      <ul id="tipsList">
+        <li>برای شروع، جرم را با موس بکشید یا اسلایدرها را تغییر دهید.</li>
+      </ul>
+    </div>
+  </div>
+  
+  <!-- پنل کنترل -->
+  <div class="panel">
+    <div class="formula-box">
+      F = -k · x
+      <small>قانون هوک</small>
+    </div>
+    
+    <div class="control-group">
+      <label><span>ثابت فنر (k)</span><span id="kVal">50 N/m</span></label>
+      <input type="range" id="kSlider" min="10" max="200" value="50" step="1">
+    </div>
+    
+    <div class="control-group">
+      <label><span>جرم (m)</span><span id="mVal">1.0 kg</span></label>
+      <input type="range" id="mSlider" min="0.5" max="20" value="1" step="0.5">
+    </div>
+    
+    <div class="control-group">
+      <label><span>میرایی (c)</span><span id="dVal">0.2</span></label>
+      <input type="range" id="dSlider" min="0" max="2" value="0.2" step="0.05">
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="label">نیروی بازیابی (N)</div>
+        <div class="value val-force" id="forceVal">0.00</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">جابه‌جایی (m)</div>
+        <div class="value val-disp" id="dispVal">0.00</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">انرژی پتانسیل (J)</div>
+        <div class="value val-pe" id="peVal">0.00</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">انرژی جنبشی (J)</div>
+        <div class="value val-ke" id="keVal">0.00</div>
+      </div>
+      <div class="stat-card" style="grid-column: span 2; background: #f4ecf7;">
+        <div class="label">دوره تناوب (T) | فرکانس (ω)</div>
+        <div class="value" id="periodVal" style="font-size: 1rem;">-</div>
+      </div>
+    </div>
+    
+    <div class="buttons">
+      <button class="primary" id="releaseBtn">🎯 رها کردن</button>
+      <button id="resetBtn">🔄 بازنشانی</button>
+    </div>
+    
+    <button id="startQuizBtn" style="background: #8e44ad; margin-top: 10px; font-weight: bold;">📝 شروع آزمون ۵ سوالی</button>
+  </div>
+
+  <!-- بخش نمودارهای تحلیلی -->
+  <div class="charts-section">
+    <div class="chart-box">
+      <h3>نمودار جابه‌جایی - زمان (x-t)</h3>
+      <canvas id="chartXT"></canvas>
+    </div>
+    <div class="chart-box">
+      <h3>نمودار سرعت - زمان (v-t)</h3>
+      <canvas id="chartVT"></canvas>
+    </div>
+    <div class="chart-box">
+      <h3>نمودار شتاب - زمان (a-t)</h3>
+      <canvas id="chartAT"></canvas>
+    </div>
+    <div class="chart-box">
+      <h3>نمودار انرژی - زمان (E-t)</h3>
+      <canvas id="chartET"></canvas>
+      <div style="text-align:center; font-size:0.8rem; margin-top:5px;">
+        <span style="color:#f39c12;">■ پتانسیل</span> | 
+        <span style="color:#27ae60;">■ جنبشی</span> | 
+        <span style="color:#8e44ad;">■ کل</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- بخش آزمون -->
+  <div class="quiz-section" id="quizSection">
+    <div class="quiz-header">
+      <h2>📝 آزمون قانون هوک</h2>
+      <span id="quizProgress" style="font-weight: bold; color: #7f8c8d;">سوال ۱ از ۵</span>
+    </div>
+    
+    <div id="quizContent">
+      <div class="quiz-question" id="questionText">متن سوال...</div>
+      <div class="quiz-options" id="optionsContainer"></div>
+    </div>
+
+    <div class="quiz-result" id="quizResult" style="display: none;">
+      <h2>نتیجه آزمون شما</h2>
+      <p class="score-text" id="finalScore">۰ از ۵</p>
+      <p id="resultMsg" style="margin-top:10px; color:#34495e; font-weight: bold;"></p>
+      
+      <!-- بخش پاسخ‌نامه -->
+      <div class="answers-review">
+        <h3>📋 پاسخ‌نامه و توضیحات</h3>
+        <div id="reviewList"></div>
+      </div>
+
+      <button class="primary" onclick="startQuiz()" style="margin-top:20px; width: 100%;">🔄 آزمون مجدد (سوالات جدید)</button>
+    </div>
+    
+    <div class="quiz-nav" id="quizNav">
+      <button id="nextBtn" style="visibility: hidden;">سوال بعدی ➡️</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================
+   ۱. بخش شبیه‌ساز اصلی و فیزیک
+   ========================================= */
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+
+const PX_PER_M = 180;
+const WALL_X = 80;
+const EQUILIBRIUM_X = 400;
+const GROUND_Y = H - 70;
+const SPRING_COILS = 14;
+
+let state = {
+  k: 50, m: 1.0, damping: 0.2,
+  x: 0, v: 0,
+  dragging: false, dragStartX: 0, dragStartOffset: 0,
+};
+
+let running = false;
+let lastTime = performance.now();
+let history = []; 
+let timeElapsed = 0;
+
+function physToScreen(physX) { return EQUILIBRIUM_X + physX * PX_PER_M; }
+
+function drawSpring(x1, y1, x2, y2, coils, amplitude) {
+  ctx.beginPath(); ctx.moveTo(x1, y1);
+  const len = x2 - x1;
+  const step = len / (coils * 2 + 1);
+  let cx = x1;
+  ctx.lineTo(cx + step * 0.5, y1);
+  cx += step * 0.5;
+  for (let i = 0; i < coils * 2; i++) {
+    const sign = i % 2 === 0 ? -1 : 1;
+    cx += step;
+    ctx.lineTo(cx, y1 + sign * amplitude);
+  }
+  cx += step; ctx.lineTo(cx, y1); ctx.lineTo(x2, y2);
+  ctx.stroke();
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#eaeded'; ctx.fillRect(0, GROUND_Y, W, H - GROUND_Y);
+  ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(0, GROUND_Y); ctx.lineTo(W, GROUND_Y); ctx.stroke();
+  
+  ctx.strokeStyle = '#bdc3c7'; ctx.setLineDash([5, 5]);
+  ctx.beginPath(); ctx.moveTo(EQUILIBRIUM_X, 40); ctx.lineTo(EQUILIBRIUM_X, GROUND_Y); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#7f8c8d'; ctx.font = 'bold 16px "B Nazanin"'; ctx.textAlign = 'center';
+  ctx.fillText('تعادل', EQUILIBRIUM_X, GROUND_Y + 25);
+  
+  ctx.fillStyle = '#d5dbdb'; ctx.fillRect(0, 60, WALL_X, GROUND_Y - 60);
+  ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 1;
+  for (let y = 60; y < GROUND_Y; y += 20) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(WALL_X, y); ctx.stroke();
+  }
+  
+  const size = 50 + Math.min(state.m * 2, 40);
+  const blockCenterX = physToScreen(state.x);
+  const blockLeft = blockCenterX - size / 2;
+  const blockTop = GROUND_Y - size;
+  const springY = blockTop + size / 2;
+  
+  const springEndX = blockLeft;
+  const amplitude = 15;
+  ctx.strokeStyle = state.x >= 0 ? '#3498db' : '#e74c3c';
+  ctx.lineWidth = 5; ctx.lineJoin = 'round';
+  drawSpring(WALL_X, springY, springEndX, springY, SPRING_COILS, amplitude);
+  
+  const blockGrad = ctx.createLinearGradient(blockLeft, blockTop, blockLeft, blockTop + size);
+  blockGrad.addColorStop(0, '#5dade2'); blockGrad.addColorStop(1, '#2874a6');
+  ctx.fillStyle = blockGrad;
+  ctx.beginPath(); ctx.roundRect(blockLeft, blockTop, size, size, 10); ctx.fill();
+  ctx.strokeStyle = '#1b4f72'; ctx.lineWidth = 2; ctx.stroke();
+  
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 16px "B Nazanin"';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(state.m.toFixed(1) + 'kg', blockCenterX, blockTop + size / 2);
+  
+  const force = -state.k * state.x;
+  if (Math.abs(force) > 0.5) {
+    const arrowLen = Math.min(120, Math.abs(force) / 5 + 20);
+    const dir = force > 0 ? 1 : -1;
+    const startX = blockCenterX + dir * (size/2 + 10);
+    const endX = startX + dir * arrowLen;
+    const arrowY = blockTop + size/2;
+    ctx.strokeStyle = '#c0392b'; ctx.fillStyle = '#c0392b'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(startX, arrowY); ctx.lineTo(endX, arrowY); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(endX, arrowY); ctx.lineTo(endX - dir * 15, arrowY - 8); ctx.lineTo(endX - dir * 15, arrowY + 8); ctx.closePath(); ctx.fill();
+    ctx.font = 'bold 16px "B Nazanin"'; ctx.fillText('F', (startX + endX) / 2, arrowY - 15);
+  }
+  drawMiniGraph();
+}
+
+function drawMiniGraph() {
+  const gw = 180, gh = 120, gx = W - gw - 20, gy = 20;
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'; ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.roundRect(gx, gy, gw, gh, 8); ctx.fill(); ctx.stroke();
+  const cx = gx + gw/2, cy = gy + gh/2 + 10;
+  ctx.strokeStyle = '#95a5a6'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(gx + 15, cy); ctx.lineTo(gx + gw - 15, cy); ctx.moveTo(cx, gy + 15); ctx.lineTo(cx, gy + gh - 15); ctx.stroke();
+  const scaleX = (gw - 40) / 2.0; const scaleY = (gh - 40) / 200;  
+  ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(cx - 1.0 * scaleX, cy + (-state.k * -1.0) * -scaleY);
+  ctx.lineTo(cx + 1.0 * scaleX, cy + (-state.k * 1.0) * -scaleY);
+  ctx.stroke();
+  const px = cx + state.x * scaleX;
+  const py = cy + (-state.k * state.x) * -scaleY;
+  ctx.fillStyle = '#2980b9'; ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI * 2); ctx.fill();
+}
+
+function update(dt) {
+  if (state.dragging) return;
+  const springForce = -state.k * state.x;
+  const dampingForce = -state.damping * state.v;
+  const acceleration = (springForce + dampingForce) / state.m;
+  state.v += acceleration * dt;
+  state.x += state.v * dt;
+  if (Math.abs(state.x) > 1.8) { state.x = Math.sign(state.x) * 1.8; state.v = 0; }
+  if (Math.abs(state.v) < 0.01 && Math.abs(springForce) < 0.5) {
+    state.v = 0; if (Math.abs(state.x) < 0.005) state.x = 0;
+  }
+}
+
+function loop(now) {
+  const dt = Math.min((now - lastTime) / 1000, 0.033);
+  lastTime = now;
+  if (running || state.dragging) {
+    for (let i = 0; i < 5; i++) update(dt / 5);
+    timeElapsed += dt;
+    const force = -state.k * state.x;
+    const pe = 0.5 * state.k * state.x * state.x;
+    const ke = 0.5 * state.m * state.v * state.v;
+    history.push({ t: timeElapsed, x: state.x, v: state.v, a: force / state.m, pe: pe, ke: ke, te: pe + ke });
+    if (history.length > 400) history.shift();
+  }
+  draw();
+  updateUI();
+  drawAllCharts();
+  requestAnimationFrame(loop);
+}
+
+function updateUI() {
+  const force = -state.k * state.x;
+  const pe = 0.5 * state.k * state.x * state.x;
+  const ke = 0.5 * state.m * state.v * state.v;
+  const omega = Math.sqrt(state.k / state.m);
+  const period = (2 * Math.PI) / omega;
+  document.getElementById('forceVal').textContent = force.toFixed(2);
+  document.getElementById('dispVal').textContent = state.x.toFixed(2);
+  document.getElementById('peVal').textContent = pe.toFixed(2);
+  document.getElementById('keVal').textContent = ke.toFixed(2);
+  document.getElementById('periodVal').textContent = `T=${period.toFixed(2)}s | ω=${omega.toFixed(2)}`;
+}
+
+function drawAllCharts() {
+  if (history.length < 2) return;
+  drawLineChart('chartXT', 'x', 'جابه‌جایی (m)', '#2980b9');
+  drawLineChart('chartVT', 'v', 'سرعت (m/s)', '#e67e22');
+  drawLineChart('chartAT', 'a', 'شتاب (m/s²)', '#c0392b');
+  drawEnergyChart();
+}
+
+function drawLineChart(canvasId, key, label, color) {
+  const cvs = document.getElementById(canvasId);
+  if (!cvs) return;
+  const c = cvs.getContext('2d');
+  const rect = cvs.getBoundingClientRect();
+  if (cvs.width !== rect.width || cvs.height !== rect.height) { cvs.width = rect.width; cvs.height = rect.height; }
+  const w = cvs.width, h = cvs.height;
+  c.clearRect(0, 0, w, h);
+  let minVal = 0, maxVal = 0;
+  history.forEach(pt => { if (pt[key] < minVal) minVal = pt[key]; if (pt[key] > maxVal) maxVal = pt[key]; });
+  if (maxVal - minVal < 0.1) { maxVal += 0.5; minVal -= 0.5; }
+  const padding = 30, plotW = w - padding * 2, plotH = h - padding * 2;
+  const zeroY = padding + plotH * (maxVal / (maxVal - minVal));
+  c.strokeStyle = '#ecf0f1'; c.lineWidth = 1; c.beginPath(); c.moveTo(padding, zeroY); c.lineTo(w - padding, zeroY); c.stroke();
+  c.strokeStyle = '#f4f7f6'; c.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) { const y = padding + (plotH / 4) * i; c.beginPath(); c.moveTo(padding, y); c.lineTo(w - padding, y); c.stroke(); }
+  c.strokeStyle = color; c.lineWidth = 2.5; c.beginPath();
+  let firstT = history[0].t, lastT = history[history.length - 1].t, timeSpan = Math.max(0.1, lastT - firstT);
+  history.forEach((pt, i) => {
+    const x = padding + ((pt.t - firstT) / timeSpan) * plotW;
+    const y = padding + plotH - (((pt[key] - minVal) / (maxVal - minVal)) * plotH);
+    if (i === 0) c.moveTo(x, y); else c.lineTo(x, y);
+  });
+  c.stroke();
+  c.fillStyle = '#7f8c8d'; c.font = '12px "B Nazanin"'; c.textAlign = 'left';
+  c.fillText(maxVal.toFixed(1), 5, padding + 10);
+  c.fillText(minVal.toFixed(1), 5, h - padding + 5);
+  c.fillText(label, w - 100, h - 5);
+}
+
+function drawEnergyChart() {
+  const cvs = document.getElementById('chartET');
+  if (!cvs) return;
+  const c = cvs.getContext('2d');
+  const rect = cvs.getBoundingClientRect();
+  if (cvs.width !== rect.width || cvs.height !== rect.height) { cvs.width = rect.width; cvs.height = rect.height; }
+  const w = cvs.width, h = cvs.height;
+  c.clearRect(0, 0, w, h);
+  let maxE = 0.1;
+  history.forEach(pt => { if (pt.te > maxE) maxE = pt.te; if (pt.pe > maxE) maxE = pt.pe; if (pt.ke > maxE) maxE = pt.ke; });
+  const padding = 30, plotW = w - padding * 2, plotH = h - padding * 2;
+  c.strokeStyle = '#f4f7f6'; c.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) { const y = padding + (plotH / 4) * i; c.beginPath(); c.moveTo(padding, y); c.lineTo(w - padding, y); c.stroke(); }
+  function plotLine(key, color) {
+    c.strokeStyle = color; c.lineWidth = 2; c.beginPath();
+    let firstT = history[0].t, lastT = history[history.length - 1].t, timeSpan = Math.max(0.1, lastT - firstT);
+    history.forEach((pt, i) => {
+      const x = padding + ((pt.t - firstT) / timeSpan) * plotW;
+      const y = padding + plotH - ((pt[key] / maxE) * plotH);
+      if (i === 0) c.moveTo(x, y); else c.lineTo(x, y);
+    });
+    c.stroke();
+  }
+  plotLine('pe', '#f39c12'); plotLine('ke', '#27ae60'); plotLine('te', '#8e44ad');
+  c.fillStyle = '#7f8c8d'; c.font = '12px "B Nazanin"'; c.textAlign = 'left';
+  c.fillText(maxE.toFixed(1) + ' J', 5, padding + 10); c.fillText('زمان', w - 50, h - 5);
+}
+
+const tipsList = document.getElementById('tipsList');
+function updateLiveTips(type, value) {
+  let html = '';
+  if (type === 'k') {
+    if (value < 50) html += `<li>ثابت فنر <b>کم</b> شد: فنر نرم‌تر است و دوره تناوب <b>بیشتر</b> می‌شود. شیب F-x کمتر شد.</li>`;
+    else html += `<li>ثابت فنر <b>زیاد</b> شد: فنر سفت‌تر است و دوره تناوب <b>کمتر</b> می‌شود. شیب F-x بیشتر شد.</li>`;
+  } else if (type === 'm') {
+    if (value > 5) html += `<li>جرم <b>سنگین</b> شد: اینرسی بیشتر شده، نوسان‌ها کندتر می‌شوند و T افزایش می‌یابد.</li>`;
+    else html += `<li>جرم <b>سبک</b> شد: نوسان‌ها تندتر شده و T کاهش می‌یابد.</li>`;
+    html += `<li>تغییر جرم، <b>شیب نمودار F-x را تغییر نمی‌دهد</b>.</li>`;
+  } else if (type === 'd') {
+    if (value === 0) html += `<li>میرایی <b>صفر</b> است: انرژی کل ثابت می‌ماند و نوسان تا ابد ادامه دارد.</li>`;
+    else if (value < 1) html += `<li>میرایی <b>ملایم</b>: دامنه نوسان به مرور کم می‌شود (نمودار انرژی کل کاهشی است).</li>`;
+    else html += `<li>میرایی <b>شدید</b>: سیستم خیلی زود متوقف می‌شود.</li>`;
+  }
+  const force = Math.abs(-state.k * state.x);
+  if (force > 50) html += `<li>⚠️ نیروی بازیابی بسیار زیاد است (بیش از ۵۰ نیوتن).</li>`;
+  tipsList.innerHTML = html || '<li>در حال تعادل...</li>';
+}
+
+document.getElementById('kSlider').addEventListener('input', (e) => { state.k = parseFloat(e.target.value); document.getElementById('kVal').textContent = state.k + ' N/m'; updateLiveTips('k', state.k); running = true; });
+document.getElementById('mSlider').addEventListener('input', (e) => { state.m = parseFloat(e.target.value); document.getElementById('mVal').textContent = state.m.toFixed(1) + ' kg'; updateLiveTips('m', state.m); running = true; });
+document.getElementById('dSlider').addEventListener('input', (e) => { state.damping = parseFloat(e.target.value); document.getElementById('dVal').textContent = state.damping.toFixed(2); updateLiveTips('d', state.damping); running = true; });
+document.getElementById('releaseBtn').addEventListener('click', () => { if (state.x === 0) state.x = 0.5; state.v = 0; running = true; });
+document.getElementById('resetBtn').addEventListener('click', () => { state.x = 0; state.v = 0; running = false; history = []; timeElapsed = 0; tipsList.innerHTML = '<li>سیستم بازنشانی شد. جرم را بکشید تا شروع شود.</li>'; });
+
+function getMousePos(e) { const rect = canvas.getBoundingClientRect(); return { x: (e.clientX - rect.left) * (canvas.width / rect.width), y: (e.clientY - rect.top) * (canvas.height / rect.height) }; }
+canvas.addEventListener('mousedown', (e) => {
+  const pos = getMousePos(e); const size = 50 + Math.min(state.m * 2, 40);
+  const blockCenterX = physToScreen(state.x); const blockLeft = blockCenterX - size/2; const blockTop = GROUND_Y - size;
+  if (pos.x >= blockLeft && pos.x <= blockLeft + size && pos.y >= blockTop && pos.y <= blockTop + size) {
+    state.dragging = true; state.dragStartX = pos.x; state.dragStartOffset = state.x; state.v = 0; running = false;
+  }
+});
+canvas.addEventListener('mousemove', (e) => {
+  if (!state.dragging) return; const pos = getMousePos(e); const dx = (pos.x - state.dragStartX) / PX_PER_M;
+  state.x = Math.max(-1.8, Math.min(1.8, state.dragStartOffset + dx)); state.v = 0;
+});
+canvas.addEventListener('mouseup', () => { if (state.dragging) { state.dragging = false; running = true; } });
+canvas.addEventListener('mouseleave', () => { if (state.dragging) { state.dragging = false; running = true; } });
+
+/* =========================================
+   ۵. بانک سوالات (با توضیحات)
+   ========================================= */
+const questionBank = [
+  { q: "طبق قانون هوک، نیروی بازیابی فنر با چه کمیتی نسبت مستقیم دارد؟", a: ["جرم", "شتاب", "جابه‌جایی از نقطه تعادل", "زمان"], correct: 2, explain: "قانون هوک بیان می‌کند که نیروی بازیابی فنر (F) با جابه‌جایی (x) از نقطه تعادل نسبت مستقیم دارد: F = -kx." },
+  { q: "اگر ثابت فنر (k) را ۴ برابر کنیم، دوره تناوب (T) چه تغییری می‌کند؟", a: ["۲ برابر می‌شود", "نصف می‌شود", "۴ برابر می‌شود", "تغییری نمی‌کند"], correct: 1, explain: "دوره تناوب با ریشه دوم k نسبت عکس دارد: T = 2π√(m/k). اگر k چهار برابر شود، √k دو برابر شده و T نصف می‌شود." },
+  { q: "رابطه انرژی پتانسیل کشسان یک فنر کدام است؟", a: ["U = kx", "U = ½kx²", "U = ½mv²", "U = mg h"], correct: 1, explain: "انرژی ذخیره شده در فنر کشیده یا فشرده شده برابر است با U = ½kx². این انرژی با مربع جابه‌جایی رابطه مستقیم دارد." },
+  { q: "در نمودار نیرو-جابه‌جایی (F-x) یک فنر ایده‌آل، مساحت زیر نمودار نشان‌دهنده چیست؟", a: ["انرژی جنبشی", "تکانه", "انرژی پتانسیل کشسان", "شتاب"], correct: 2, explain: "مساحت زیر نمودار F-x برابر با کار انجام شده روی فنر است که به صورت انرژی پتانسیل کشسان (½kx²) در آن ذخیره می‌شود." },
+  { q: "هنگامی که جرم از نقطه تعادل عبور می‌کند، کدام گزینه صحیح است؟", a: ["نیرو ماکزیمم و سرعت صفر است", "نیرو صفر و سرعت ماکزیمم است", "نیرو و سرعت هر دو ماکزیمم‌اند", "نیرو و سرعت هر دو صفرند"], correct: 1, explain: "در نقطه تعادل (x=0)، فنر نه کشیده و نه فشرده است، پس نیرو صفر است. تمام انرژی پتانسیل به جنبشی تبدیل شده، پس سرعت ماکزیمم است." },
+  { q: "واحد اندازه‌گیری ثابت فنر (k) در سیستم SI چیست؟", a: ["نیوتن (N)", "ژول (J)", "نیوتن بر متر (N/m)", "کیلوگرم بر ثانیه (kg/s)"], correct: 2, explain: "از رابطه F = -kx داریم k = F/x. واحد نیرو نیوتن و واحد جابه‌جایی متر است، بنابراین واحد k برابر نیوتن بر متر (N/m) است." },
+  { q: "اگر جرم متصل به فنر را ۴ برابر کنیم، فرکانس زاویه‌ای (ω) چه می‌شود؟", a: ["۲ برابر", "نصف", "۴ برابر", "یک‌چهارم"], correct: 1, explain: "فرکانس زاویه‌ای ω = √(k/m) است. اگر m چهار برابر شود، m زیر رادیکال ۴ برابر شده و ω نصف می‌شود." },
+  { q: "در یک سیستم جرم-فنر بدون اصطکاک، انرژی کل مکانیکی چگونه است؟", a: ["به مرور زمان کاهش می‌یابد", "به مرور زمان افزایش می‌یابد", "ثابت می‌ماند", "در نقطه تعادل صفر است"], correct: 2, explain: "در غیاب نیروهای غیرپایستار (مثل اصطکاک)، انرژی مکانیکی سیستم پایسته است و مجموع انرژی جنبشی و پتانسیل همیشه ثابت می‌ماند." },
+  { q: "نیروی بازیابی در فنر همیشه در چه جهتی است؟", a: ["در جهت جابه‌جایی", "در خلاف جهت جابه‌جایی (به سمت تعادل)", "عمود بر جابه‌جایی", "به سمت پایین"], correct: 1, explain: "علامت منفی در قانون هوک (F = -kx) نشان می‌دهد که نیروی فنر همیشه در خلاف جهت جابه‌جایی است و سعی می‌کند جسم را به نقطه تعادل برگرداند." },
+  { q: "کدام یک از عوامل زیر باعث می‌شود نوسان‌های یک فنر در دنیای واقعی به تدریج متوقف شوند؟", a: ["افزایش جرم", "کاهش ثابت فنر", "نیروی میرایی (اصطکاک و مقاومت هوا)", "افزایش دامنه نوسان"], correct: 2, explain: "در دنیای واقعی، عواملی مانند اصطکاک و مقاومت هوا نیروی میرایی ایجاد می‌کنند که در خلاف جهت سرعت عمل کرده و انرژی مکانیکی را به تدریج به گرما تبدیل می‌کند." },
+  { q: "فرمول دوره تناوب نوسان یک جرم متصل به فنر کدام است؟", a: ["T = 2π√(k/m)", "T = 2π√(m/k)", "T = 2π(m/k)", "T = 2π(k/m)"], correct: 1, explain: "دوره تناوب نوسان‌گر جرم-فنر از رابطه T = 2π√(m/k) به دست می‌آید. این رابطه نشان می‌دهد T با جرم نسبت مستقیم و با ثابت فنر نسبت عکس دارد." },
+  { q: "هنگامی که فنر در حداکثر کشیدگی است، انرژی جنبشی جرم چقدر است؟", a: ["ماکزیمم", "صفر", "نصف انرژی پتانسیل", "برابر با انرژی کل"], correct: 1, explain: "در نقاط انتهایی (حداکثر جابه‌جایی)، سرعت جرم صفر می‌شود. بنابراین انرژی جنبشی (½mv²) نیز صفر است و تمام انرژی سیستم به صورت پتانسیل کشسان ذخیره می‌شود." },
+  { q: "در کدام نقطه از نوسان، شتاب جرم حداکثر است؟", a: ["در نقطه تعادل", "در نقاط انتهایی (حداکثر جابه‌جایی)", "در میانه راه بین تعادل و انتها", "شتاب همیشه ثابت است"], correct: 1, explain: "بر اساس قانون دوم نیوتن (F=ma) و قانون هوک (F=-kx)، شتاب a = -(k/m)x است. بنابراین شتاب در بیشترین جابه‌جایی (نقاط انتهایی) بیشترین مقدار را دارد." },
+  { q: "اگر ثابت فنر را دو برابر و جرم را نیز دو برابر کنیم، دوره تناوب چه تغییری می‌کند؟", a: ["دو برابر می‌شود", "نصف می‌شود", "تغییری نمی‌کند", "۴ برابر می‌شود"], correct: 2, explain: "فرمول T = 2π√(m/k) است. اگر هم m و هم k دو برابر شوند، کسر m/k بدون تغییر می‌ماند، بنابراین دوره تناوب ثابت می‌ماند." },
+  { q: "کدام کمیت فیزیکی در نوسان یک فنر، همیشه در خلاف جهت جابه‌جایی است؟", a: ["سرعت", "شتاب", "نیروی بازیابی", "انرژی جنبشی"], correct: 2, explain: "طبق تعریف قانون هوک، نیروی بازیابی (F) همیشه در جهت مخالف جابه‌جایی (x) است تا جسم را به تعادل برگرداند. اما سرعت می‌تواند هم‌جهت یا خلاف جهت جابه‌جایی باشد." },
+  { q: "بیشترین مقدار انرژی پتانسیل فنر در کدام حالت است؟", a: ["وقتی جرم از تعادل عبور می‌کند", "وقتی جرم در حداکثر جابه‌جایی است", "وقتی سرعت ماکزیمم است", "انرژی پتانسیل همیشه ثابت است"], correct: 1, explain: "انرژی پتانسیل فنر با مربع جابه‌جایی (½kx²) رابطه مستقیم دارد. بنابراین بیشترین مقدار آن در حداکثر جابه‌جایی (نقاط انتهایی نوسان) رخ می‌دهد." },
+  { q: "نمودار جابه‌جایی-زمان (x-t) یک نوسان‌گر ساده (بدون میرایی) چه شکلی است؟", a: ["خط راست", "سهمی", "موج سینوسی", "نمودار نمایی"], correct: 2, explain: "نوسان‌گر هماهنگ ساده حرکت دوره‌ای دارد که معادله آن به صورت x(t) = A·cos(ωt + φ) است. نمودار این تابع یک موج سینوسی (یا کسینوسی) است." },
+  { q: "اگر جرم یک سیستم جرم-فنر را افزایش دهیم، چه اتفاقی برای اینرسی سیستم می‌افتد؟", a: ["کاهش می‌یابد", "تغییری نمی‌کند", "افزایش می‌یابد", "به صفر می‌رسد"], correct: 2, explain: "اینرسی (لختی) معیاری از مقاومت جسم در برابر تغییر سرعت است و مستقیماً به جرم بستگی دارد. با افزایش جرم، اینرسی سیستم نیز افزایش می‌یابد." },
+  { q: "در نمودار انرژی-زمان (E-t) بدون میرایی، مجموع انرژی پتانسیل و جنبشی چگونه است؟", a: ["خطی افزایش می‌یابد", "خطی کاهش می‌یابد", "به صورت یک خط افقی ثابت است", "به شکل سینوسی تغییر می‌کند"], correct: 2, explain: "در سیستم بدون میرایی، انرژی کل پایسته است. بنابراین مجموع انرژی پتانسیل و جنبشی در طول زمان ثابت می‌ماند و نمودار آن یک خط افقی است." },
+  { q: "میرایی بحرانی چه ویژگی‌ای دارد؟", a: ["سیستم سریع‌ترین بازگشت به تعادل را بدون نوسان دارد", "سیستم هرگز نوسان نمی‌کند", "دامنه نوسان بی‌نهایت می‌شود", "فرکانس نوسان صفر می‌شود ولی نوسان ادامه دارد"], correct: 0, explain: "در میرایی بحرانی، سیستم بدون هیچ نوسانی و در کوتاه‌ترین زمان ممکن به وضعیت تعادل بازمی‌گردد. این حالت مرز بین حرکت نوسانی (میرایی کم) و غیرنوسانی (میرایی زیاد) است." }
+];
+
+let currentQuizQuestions = [];
+let currentQuestionIndex = 0;
+let userAnswers = [];
+let quizCorrectAnswersCount = 0;
+
+function startQuiz() {
+  const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
+  currentQuizQuestions = shuffled.slice(0, 5);
+  currentQuestionIndex = 0;
+  userAnswers = new Array(5).fill(null);
+  quizCorrectAnswersCount = 0;
+  
+  document.getElementById('quizSection').style.display = 'block';
+  document.getElementById('quizResult').style.display = 'none';
+  document.getElementById('quizContent').style.display = 'block';
+  document.getElementById('quizNav').style.display = 'flex';
+  document.getElementById('nextBtn').style.visibility = 'hidden';
+  
+  loadQuestion();
+  document.getElementById('quizSection').scrollIntoView({ behavior: 'smooth' });
+}
+
+function loadQuestion() {
+  const q = currentQuizQuestions[currentQuestionIndex];
+  document.getElementById('quizProgress').textContent = `سوال ${currentQuestionIndex + 1} از ۵`;
+  document.getElementById('questionText').textContent = q.q;
+  
+  const optionsContainer = document.getElementById('optionsContainer');
+  optionsContainer.innerHTML = '';
+  
+  const optionsWithIndex = q.a.map((text, index) => ({ text, isCorrect: index === q.correct, originalIndex: index }));
+  optionsWithIndex.sort(() => 0.5 - Math.random());
+  
+  optionsWithIndex.forEach((opt, index) => {
+    const div = document.createElement('div');
+    div.className = 'quiz-option';
+    div.textContent = opt.text;
+    
+    if (userAnswers[currentQuestionIndex] !== null) {
+      if (opt.isCorrect) div.classList.add('correct');
+      // بررسی اینکه آیا این گزینه، گزینه انتخاب شده توسط کاربر است
+      if (userAnswers[currentQuestionIndex] === opt.originalIndex && !opt.isCorrect) div.classList.add('wrong');
+    } else {
+      div.onclick = () => selectAnswer(opt.originalIndex, opt.isCorrect, div);
+    }
+    optionsContainer.appendChild(div);
+  });
+  
+  if (userAnswers[currentQuestionIndex] !== null) {
+    document.getElementById('nextBtn').style.visibility = 'visible';
+    document.getElementById('nextBtn').textContent = currentQuestionIndex === 4 ? 'مشاهده نتیجه ✅' : 'سوال بعدی ➡️';
+  } else {
+    document.getElementById('nextBtn').style.visibility = 'hidden';
+  }
+}
+
+function selectAnswer(selectedOriginalIndex, isCorrect, element) {
+  userAnswers[currentQuestionIndex] = selectedOriginalIndex;
+  if (isCorrect) quizCorrectAnswersCount++;
+  
+  const options = document.querySelectorAll('.quiz-option');
+  options.forEach((opt) => {
+    opt.onclick = null;
+    // پیدا کردن گزینه درست و رنگ کردن آن
+    if (opt.textContent === currentQuizQuestions[currentQuestionIndex].a[currentQuizQuestions[currentQuestionIndex].correct]) {
+      opt.classList.add('correct');
+    }
+  });
+  
+  if (!isCorrect) element.classList.add('wrong');
+  
+  document.getElementById('nextBtn').style.visibility = 'visible';
+  if (currentQuestionIndex === 4) {
+    document.getElementById('nextBtn').textContent = 'مشاهده نتیجه ✅';
+  } else {
+    document.getElementById('nextBtn').textContent = 'سوال بعدی ➡️';
+  }
+}
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  if (currentQuestionIndex < 4) {
+    currentQuestionIndex++;
+    loadQuestion();
+  } else {
+    showResults();
+  }
+});
+
+function showResults() {
+  document.getElementById('quizContent').style.display = 'none';
+  document.getElementById('quizNav').style.display = 'none';
+  document.getElementById('quizResult').style.display = 'block';
+  
+  document.getElementById('finalScore').textContent = `${quizCorrectAnswersCount} از ۵`;
+  
+  const msg = document.getElementById('resultMsg');
+  if (quizCorrectAnswersCount === 5) {
+    msg.textContent = "عالی بود! شما به قانون هوک کاملاً مسلط هستید. 🌟";
+    msg.style.color = "#27ae60";
+  } else if (quizCorrectAnswersCount >= 3) {
+    msg.textContent = "خوب بود! اما با مطالعه بیشتر می‌توانید بهتر شوید. 👍";
+    msg.style.color = "#d35400";
+  } else {
+    msg.textContent = "نیاز به تمرین بیشتر دارید. شبیه‌ساز را بررسی کنید و دوباره امتحان کنید. 💪";
+    msg.style.color = "#c0392b";
+  }
+
+  // ساخت پاسخ‌نامه کامل
+  const reviewList = document.getElementById('reviewList');
+  reviewList.innerHTML = '';
+  
+  currentQuizQuestions.forEach((q, index) => {
+    const userAnswerIdx = userAnswers[index];
+    const isCorrect = userAnswerIdx === q.correct;
+    
+    const itemDiv = document.createElement('div');
+    itemDiv.className = `review-item ${isCorrect ? 'correct' : 'wrong'}`;
+    
+    const qDiv = document.createElement('div');
+    qDiv.className = 'review-q';
+    qDiv.textContent = `سوال ${index + 1}: ${q.q}`;
+    
+    const userAnsDiv = document.createElement('div');
+    userAnsDiv.className = `review-a ${isCorrect ? 'correct-text' : 'wrong-text'}`;
+    if (userAnswerIdx !== null) {
+      userAnsDiv.textContent = `پاسخ شما: ${q.a[userAnswerIdx]}`;
+    } else {
+      userAnsDiv.textContent = `پاسخ شما: (بدون پاسخ)`;
+      userAnsDiv.className = 'review-a wrong-text';
+    }
+    
+    const correctAnsDiv = document.createElement('div');
+    correctAnsDiv.className = 'review-a correct-text';
+    correctAnsDiv.textContent = `پاسخ صحیح: ${q.a[q.correct]}`;
+    
+    const explainDiv = document.createElement('div');
+    explainDiv.className = 'review-explain';
+    explainDiv.innerHTML = `<b>توضیح:</b> ${q.explain}`;
+    
+    itemDiv.appendChild(qDiv);
+    itemDiv.appendChild(userAnsDiv);
+    itemDiv.appendChild(correctAnsDiv);
+    itemDiv.appendChild(explainDiv);
+    
+    reviewList.appendChild(itemDiv);
+  });
+}
+
+document.getElementById('startQuizBtn').addEventListener('click', startQuiz);
+updateLiveTips('k', 50);
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
